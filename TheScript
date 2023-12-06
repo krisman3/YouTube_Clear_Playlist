@@ -1,0 +1,50 @@
+function removeVideosFromWatchLater() {
+    const videoItems = document.querySelectorAll('ytd-playlist-video-renderer');
+
+    if (videoItems.length > 0) {
+        processVideoItems(videoItems, 0);
+    } else {
+        console.log('No videos found in the Watch Later playlist.');
+    }
+}
+
+function processVideoItems(videoItems, index) {
+    if (index < videoItems.length) {
+        const videoItem = videoItems[index];
+        
+        // Find and click on the dropdown trigger button
+        const dropdownTrigger = videoItem.querySelector('.dropdown-trigger.style-scope.ytd-menu-renderer');
+        if (dropdownTrigger) {
+            dropdownTrigger.click();
+            
+            // Wait for the dropdown menu to appear (adjust the delay if needed)
+            setTimeout(() => {
+                // Find and click on the "Remove from Watch Later" button using XPath
+                const removeButtonXPath = '//span[contains(text(), "Remove from")]';
+                const removeButton = document.evaluate(removeButtonXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+
+                if (removeButton) {
+                    removeButton.click();
+                    console.log(`Removed video ${index + 1} from Watch Later.`);
+                } else {
+                    console.log(`Could not find "Remove" button for video ${index + 1}.`);
+                }
+
+                // Process the next video after a delay (adjust the delay if needed)
+                setTimeout(() => {
+                    processVideoItems(videoItems, index + 1);
+                }, 500);
+            }, 500);
+        } else {
+            console.log(`Could not find dropdown trigger for video ${index + 1}.`);
+            
+            // Process the next video without delay
+            processVideoItems(videoItems, index + 1);
+        }
+    } else {
+        console.log('Finished processing all videos in the Watch Later playlist.');
+    }
+}
+
+// Run the script
+removeVideosFromWatchLater();
